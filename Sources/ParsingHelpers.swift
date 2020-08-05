@@ -624,6 +624,14 @@ extension Formatter {
             return ["<", "[", "(", "case"].contains(scope.string)
         case .delimiter, .operator(_, .infix), .operator(_, .postfix):
             return false
+        case .startOfScope("{") where isStartOfClosure(at: i):
+            if last(.nonSpaceOrComment, before: i)?.isLinebreak == true,
+                let prevToken = last(.nonSpaceOrCommentOrLinebreak, before: i),
+                !prevToken.isIdentifier || ["true", "false", "nil"].contains(prevToken.string)
+            {
+                return true
+            }
+            return false
         default:
             return true
         }
